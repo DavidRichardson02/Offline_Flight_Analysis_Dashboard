@@ -1,0 +1,2 @@
+importMode,schemaMode,gpsChannelsPresent,totalRawLines,commentLinesRemoved,emptyLinesRemoved,repeatedHeadersRemoved,droppedMalformedRows,validRowsImported,strictImportFailed,strictImportErrorIdentifier,strictImportErrorMessage,nonmonotonicTimestampsRemoved,duplicateTimestampsRemoved,rowsRemovedMissingTimestamp,rowsBeforeCleaning,rowsAfterCleaning
+strict,minimal,0,NaN,NaN,NaN,0,0,2150,0,,,0,0,0,2150,2150
