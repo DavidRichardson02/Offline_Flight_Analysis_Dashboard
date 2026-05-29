@@ -1,5 +1,14 @@
 # Caelum MATLAB Flight Analysis Package
 
+
+<img width="2056" height="1329" alt="Screenshot 2026-03-26 at 11 44 59 PM" src="https://github.com/user-attachments/assets/13e2e012-6c63-497b-82c5-b69b9da50daf" />
+
+<img width="1931" height="1222" alt="Screenshot 2026-05-29 at 6 07 04 PM" src="https://github.com/user-attachments/assets/568e1bb3-0fb9-444d-a625-89e5ba625979" />
+
+
+
+
+
 Offline post-flight analysis, estimator replay, and validation tools for Caelum SD logger flight data.
 
 This repository focuses on the current Caelum engineering workflow: replaying the vertical estimator offline, inspecting estimator behavior through a dense diagnostic dashboard, validating against synthetic truth, and stress-testing tuning changes with Monte Carlo runs.
