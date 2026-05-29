@@ -1,0 +1,34 @@
+domain,source_name,export_name,units,type,required_for_firmware,parity_checked,notes
+vertical_replay,t,t,s,double,true,false,Common replay timebase in seconds after cleaning.
+vertical_replay,a_vertical_used,a_vertical_used,m/s^2,double,true,true,Acceleration actually consumed by replay after attitude fallback logic.
+vertical_replay,vertical_input_mode,vertical_input_mode,enum,string,true,false,Legacy or attitude-selected replay input mode.
+vertical_replay,attitude_fallback_used,attitude_fallback_used,bool,logical,true,false,True when attitude input was requested but replay fell back to legacy acceleration.
+vertical_replay,h,h,m,double,true,true,Replay altitude state.
+vertical_replay,v,v,m/s,double,true,true,Replay vertical velocity state.
+vertical_replay,b_a,b_a,m/s^2,double,true,true,Replay accelerometer bias state.
+vertical_replay,beta,beta,1/m,double,true,true,Replay drag/beta state.
+vertical_replay,sigma_h,sigma_h,m,double,true,true,Replay altitude uncertainty.
+vertical_replay,sigma_v,sigma_v,m/s,double,true,true,Replay vertical velocity uncertainty.
+vertical_replay,innovation_h,innovation_h,m,double,true,false,Barometric altitude innovation.
+vertical_replay,innovation_nis,innovation_nis,unitless,double,true,false,Normalized innovation squared for the barometric update.
+vertical_replay,baro_used,baro_used,bool,logical,true,true,True when the barometric update was accepted.
+vertical_replay,baro_rejected,baro_rejected,bool,logical,true,true,True when the barometric update was rejected by gating.
+vertical_replay,accel_input,accel_input,m/s^2,double,false,false,Raw replay acceleration input before internal clipping or correction.
+vertical_replay,accel_effective,accel_effective,m/s^2,double,false,false,Acceleration after estimator-side limiting.
+vertical_replay,drag_accel,drag_accel,m/s^2,double,false,false,Estimated drag acceleration contribution inside the vertical EKF.
+vertical_replay,beta_learning_enabled,beta_learning_enabled,bool,logical,false,false,True when the replay beta state is allowed to adapt.
+attitude_replay,q_w,q_w,unitless,double,true,false,Quaternion scalar component.
+attitude_replay,q_x,q_x,unitless,double,true,false,Quaternion x component.
+attitude_replay,q_y,q_y,unitless,double,true,false,Quaternion y component.
+attitude_replay,q_z,q_z,unitless,double,true,false,Quaternion z component.
+attitude_replay,a_vertical_attitude,a_vertical_attitude,m/s^2,double,true,false,Attitude-derived vertical acceleration before replay fallback handling.
+attitude_replay,gravity_update_used,gravity_update_used,bool,logical,true,false,True when accelerometer gravity correction was applied.
+attitude_replay,gravity_innovation,gravity_innovation,unitless,double,true,false,Norm of the accelerometer-to-gravity innovation vector.
+attitude_replay,gravity_residual,gravity_residual,m/s^2,double,true,false,Acceleration magnitude residual relative to expected gravity.
+attitude_replay,tilt_error_deg,tilt_error_deg,deg,double,true,false,Instantaneous tilt error used for inspection.
+attitude_replay,roll_deg,roll_deg,deg,double,false,false,Derived roll angle for inspection.
+attitude_replay,pitch_deg,pitch_deg,deg,double,false,false,Derived pitch angle for inspection.
+attitude_replay,yaw_deg,yaw_deg,deg,double,false,false,Derived yaw angle for inspection.
+attitude_replay,b_gx,b_gx,rad/s,double,true,false,Estimated gyro bias on x.
+attitude_replay,b_gy,b_gy,rad/s,double,true,false,Estimated gyro bias on y.
+attitude_replay,b_gz,b_gz,rad/s,double,true,false,Estimated gyro bias on z.
