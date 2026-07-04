@@ -1,42 +1,180 @@
-Caelum Patched Release
-======================
+Caelum V3 / Integrated Dashboard V4 Release Notes
+=================================================
 
-This release packages the canonical V3 refactor and adds a local MATLAB validation harness:
+Release status: public GitHub repository update
+Repository: DavidRichardson02/Offline_Flight_Analysis_Dashboard
+Primary validation entry point: validate_caelum_release.m
 
-- validate_caelum_release.m
+Overview
+--------
 
-Recommended local validation:
-1. Open the package folder in MATLAB.
-2. Run:
-   validate_caelum_release
+This release packages the current Caelum offline flight-analysis environment for public repository handoff. It contains the canonical V3 MATLAB analysis/refactor package together with the integrated V4 dashboard surface, firmware telemetry contracts, serial/live playback utilities, representative validation fixtures, and release-facing validation scripts.
 
-This will:
-- generate a synthetic V2 GPS/3D truth-aware log when available
-- run caelum.analyzeLog(...)
-- run caelum.runMonteCarloValidation(...)
-- surface any remaining runtime integration errors in MATLAB directly
+The project is no longer only a basic post-flight plotting package. It now acts as a reviewable engineering environment for telemetry ingestion, firmware schema alignment, estimator replay, mission scoring context, dashboard evidence review, live serial telemetry buffering, and validation-driven handoff.
 
-Notes:
-- This package was hardened for handoff and packaging consistency.
-- Runtime execution could not be performed in the current environment because MATLAB/Octave was unavailable here.
+Major Capabilities
+------------------
+
+1. End-to-end MATLAB analysis
+
+   - caelum.analyzeLog is the main orchestration entry point.
+   - Import is attempted through the strict CSV importer and then through a robust fallback path when needed.
+   - Imported data is aligned into the Caelum dashboard contract before cleaning and event detection.
+   - Results include cleaned data, detected events, replay outputs, attitude diagnostics, truth metrics, consistency metrics, optional 3D/GPS replay, wind estimates, dashboards, and export metadata.
+
+2. Vertical estimator replay
+
+   - Offline vertical replay supports innovation, NIS, barometric gating, covariance, acceleration-bias, beta-learning, and replay contract checks.
+   - Vertical replay validation is covered by validate_vertical_replay_stack.m and replay contract fixture checks.
+
+3. Attitude, 3D/GPS, and wind analysis
+
+   - The default configuration enables attitude replay and 3D/GPS replay when supporting fields are available.
+   - The analysis path can attach attitude fields, run the 3D EKF, and estimate wind from the 3D replay output.
+   - Focused diagnostics include attitude/gravity provenance and 3D trajectory/wind uncertainty views.
+
+4. Integrated dashboard surface
+
+   - plotDashboard creates the current Caelum Integrated Dashboard V4 surface.
+   - The dashboard includes primary flight-state plots, estimator plots, GPS/3D plots, wind plots, optional evidence strips, policy/phase diagnostics, provenance panels, telemetry freshness, and summary information.
+   - Optional widgets are controlled through configuration fields such as dashboardWidgets, dashboard.widgets, and layout flags.
+
+5. Firmware/dashboard contract alignment
+
+   - firmware_sdlog_schema.csv mirrors the latest checked SD logger telemetry order.
+   - firmware_serial_telemetry_schema.csv mirrors the latest checked serial HDR/TLM payload order.
+   - validate_firmware_dashboard_alignment.m treats the firmware reference as the source of truth for dashboard import contracts.
+   - The validation checks schema order, field counts, fixture prefixes, GPS extras, serial aliases, live-buffer snapshots, target semantics, and firmware/mission target separation.
+
+6. Serial telemetry and live playback
+
+   - caelum.importSerialTelemetry parses firmware HDR/TLM serial captures without shifting malformed rows into incorrect columns.
+   - Live support includes createLiveTelemetryBuffer, appendLiveTelemetryBuffer, snapshotLiveTelemetryBuffer, readLiveSerialTelemetry, and startLiveSerialDashboard.
+   - The live playback design supports offline SD replay, captured serial replay, bounded serial buffering, parser-health counters, dashboard snapshots, and true live serialport-backed ingestion.
+
+7. IREC mission profile support
+
+   - caelum.irecMissionProfile defines the IREC 10,000 ft AGL mission scoring profile.
+   - The default mission target is encoded as 3048.0 m.
+   - Firmware policy target fields remain distinct from the mission/scoring target even when the numeric target values are deliberately aligned.
+
+Release Validation
+------------------
+
+Run the release-facing validation gate from the repository root in MATLAB:
+
+    addpath(genpath(pwd));
+    validation = validate_caelum_release;
+
+The release validator performs the following top-level checks:
+
+- renders release dashboard windows when MakeDashboards is enabled
+- runs validate_firmware_dashboard_alignment
+- runs validate_vertical_replay_stack
+- runs validate_irec_mission_profile
+- runs validate_live_telemetry_import
+- combines those results into validation.overallPassed
+- throws an error if a required release gate fails
+
+Focused validators are also included for subsystem-level review:
+
+- validate_replay_contract_diff_viewer
+- validate_flight_evidence_navigator
+- validate_telemetry_freshness_heatmap
+- validate_causality_graph
+- validate_phase_state_machine_timeline
+- validate_policy_decision_audit
+- validate_estimator_trust_dashboard
+- validate_attitude_gravity_provenance_view
+- validate_3d_trajectory_wind_uncertainty_tube
+- validate_apogee_sensitivity_waterfall
+- validate_monte_carlo_mission_envelope_board
+
+Important Runtime Note
+----------------------
+
+MATLAB runtime validation was not executed from this repository-update environment. The repository has been updated based on source inspection and documented validation entry points. Final release acceptance should be performed by running validate_caelum_release in MATLAB from the repository root.
+
+Tracked Inputs
+--------------
+
+This release intentionally tracks the files needed to inspect, validate, and extend the project:
+
+- MATLAB source code under +caelum/
+- release and feature validators at the repository root
+- firmware schema contracts
+- representative SD and serial telemetry fixtures
+- vertical replay contract fixtures
+- documentation and release notes
+- firmware reference source and documentation under CaelumSufflamen/
+
+Ignored Outputs
+---------------
+
+The repository intentionally excludes regenerated or local-only artifacts:
+
+- exports/
+- Screen Captures/
+- generated Monte Carlo logs
+- generated validation outputs
+- MATLAB autosaves and binary workspaces
+- Python caches and bytecode
+- Arduino/Teensy build products
+- local IDE metadata
+- OS metadata
+- local environment files, credentials, keys, tokens, and certificates
+
+Repository Metadata Update
+--------------------------
+
+Recommended GitHub repository description:
+
+    MATLAB offline flight-analysis dashboard for Caelum telemetry, estimator replay, firmware contract validation, live serial playback, and mission evidence review.
+
+Recommended GitHub topics:
+
+    matlab
+    flight-analysis
+    telemetry
+    rocket
+    aerospace
+    sensor-fusion
+    estimator-replay
+    kalman-filter
+    gps
+    serial-telemetry
+    teensy
+    firmware-validation
+    monte-carlo
+    dashboard
+    validation
+    caelum
+
+License
+-------
+
+The repository has been prepared for MIT licensing. See the root LICENSE file.
+
+Previous Integration Notes
+--------------------------
 
 2026-06-15 Firmware telemetry integration update:
-- firmware_sdlog_schema.csv now matches the latest local Teensy 4.1 SD logger header from C:\Users\98dav\Documents\CaelumSufflamen\utils\sd_logger.cpp.
-- Import/schema alignment now maps latest firmware fields such as est_h, est_v, est_a, and q0/q1/q2/q3 into the existing dashboard analysis contract.
-- plotDashboard now includes firmware phase, phase diagnostics, policy command, actuator, apogee-prediction, and warning telemetry panels.
-- caelum.playLiveFlight provides the first live-style playback view for offline CSVs, cleaned tables, or analyzeLog result structs.
+
+- firmware_sdlog_schema.csv was aligned with the local Teensy 4.1 SD logger header from CaelumSufflamen/utils/sd_logger.cpp.
+- Import/schema alignment maps latest firmware fields such as est_h, est_v, est_a, and q0/q1/q2/q3 into the dashboard analysis contract.
+- plotDashboard includes firmware phase, phase diagnostics, policy command, actuator, apogee-prediction, and warning telemetry panels.
+- caelum.playLiveFlight provides live-style playback for offline CSVs, cleaned tables, serial captures, and analyzeLog result structs.
 - caelum.importSerialTelemetry parses captured serial HDR/TLM telemetry into the dashboard table contract.
-- caelum.createLiveTelemetryBuffer, appendLiveTelemetryBuffer, snapshotLiveTelemetryBuffer, and readLiveSerialTelemetry add the bounded ring-buffer and serialport-reader path for true live ingestion.
-- caelum.startLiveSerialDashboard adds the callback-driven serial ingestion loop with a live dashboard, parser-health status, pause/resume, and scrub controls over the buffered samples.
-- caelum.irecMissionProfile defines the source-backed IREC 2026 mission scoring profile for the 10,000 ft AGL use-case: 3048.0 m target apogee, 7,000 ft to 13,000 ft scoring band, and COTS barometric altimeter as the official altitude source.
-- plotDashboard, playLiveFlight, and startLiveSerialDashboard now distinguish the IREC scoring target from firmware target_apogee/target_effective telemetry.
-- plotDashboard and summarizeLog gate IREC target-error reporting so low-altitude legacy/drop-test logs show the 10,000 ft target as reference context instead of a misleading score-like error.
+- Live telemetry buffer and serialport-reader paths were added for true live ingestion.
+- startLiveSerialDashboard adds the callback-driven serial ingestion loop with parser-health status, pause/resume, scrub controls, and buffered samples.
+- caelum.irecMissionProfile defines the IREC 2026 10,000 ft AGL mission scoring profile.
 - LIVE_PLAYBACK_EXTENSION_DESIGN.md documents the current serial-backed live playback architecture, live dashboard loop, and mission scoring profile.
 
 2026-06-16 Phase 2 firmware/dashboard contract alignment:
-- firmware_sdlog_schema.csv now mirrors the full 79-field SD logger header emitted by C:\Users\98dav\Documents\CaelumSufflamen\utils\sd_logger.cpp.
-- firmware_serial_telemetry_schema.csv captures the separate 76-field Serial HDR/TLM payload emitted by C:\Users\98dav\Documents\CaelumSufflamen\utils\telemetry.cpp.
-- validate_firmware_dashboard_alignment.m compares checked MATLAB schema contracts against the firmware header strings, validates the regenerated SD and Serial fixtures, and reports firmware policy target separately from the IREC scoring target.
-- Synthetic_LatestFirmware_PracticalFlight_WithGPS.csv was regenerated with the exact SD firmware prefix plus trailing GPS playback fields.
-- Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt adds a Serial capture-style fixture with repeated HDR, STATUS, and malformed-row coverage for parser and ring-buffer validation.
-- The attached firmware target was deliberately aligned to the 10,000 ft mission by setting POLICY_TARGET_APOGEE_M to 3048.0 m in C:\Users\98dav\Documents\CaelumSufflamen\utils\config.h.
+
+- firmware_sdlog_schema.csv mirrors the full SD logger header emitted by the firmware reference.
+- firmware_serial_telemetry_schema.csv captures the serial HDR/TLM payload emitted by the firmware reference.
+- validate_firmware_dashboard_alignment.m compares checked MATLAB schema contracts against firmware header strings, validates regenerated SD and Serial fixtures, and reports firmware policy target separately from the IREC scoring target.
+- Synthetic_LatestFirmware_PracticalFlight_WithGPS.csv was regenerated with the SD firmware prefix plus trailing GPS playback fields.
+- Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt adds a serial capture-style fixture with repeated HDR, STATUS, and malformed-row coverage for parser and ring-buffer validation.
+- The firmware policy target is deliberately aligned to the 10,000 ft mission by setting POLICY_TARGET_APOGEE_M to 3048.0 m in the firmware config.
