@@ -1,0 +1,86 @@
+# OS and editor metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
+
+# Local environment and secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_dsa
+secrets/
+credentials/
+
+# MATLAB generated files and caches
+*.asv
+*.m~
+*.mlx.autosave
+*.mat
+*.fig
+*.mex*
+slprj/
+codegen/
+cache/
+work/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Arduino, firmware, and embedded build outputs
+.build/
+build/
+out/
+dist/
+*.elf
+*.hex
+*.ehex
+*.eep
+*.lst
+*.map
+*.sym
+*.o
+*.obj
+*.d
+*.a
+*.bin
+
+# Dashboard and validation render outputs
+exports/
+Screen Captures/
+Documents and Tools/Screenshot*.png
+
+# Generated Monte Carlo run logs
+Flight Data/mc_logs/
+CaelumSufflamen/validation/flight data/mc_logs/
+
+# Generated firmware validation result payloads.
+# Keep human-written result notes and README files trackable.
+CaelumSufflamen/validation/results/*.csv
+CaelumSufflamen/validation/results/*.json
+CaelumSufflamen/validation/results/*.svg
+CaelumSufflamen/validation/results/*.png
+CaelumSufflamen/validation/results/*.pdf
+CaelumSufflamen/validation/results/*.html
+CaelumSufflamen/validation/results/*.log
+
+# Logs and local databases
+*.log
+*.db
+*.sqlite
+*.sqlite3

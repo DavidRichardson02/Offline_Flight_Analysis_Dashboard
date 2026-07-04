@@ -1,0 +1,2 @@
+event_name,t_us,source,confidence,est_h_m,est_v_mps,notes
+apogee,120000,synthetic,high,320.0,-5.0,"Analytic fixture apogee, not observed flight data."

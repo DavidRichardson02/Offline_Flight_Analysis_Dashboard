@@ -1,0 +1,77 @@
+field,units,type,required,notes
+t_ms,ms,uint32,true,Firmware Serial telemetry timestamp from millis().
+baro_valid,bool,double,true,Barometer snapshot validity flag.
+baro_upd,bool,double,true,Barometer snapshot updated during the current scheduler pass.
+baro_seq,count,uint32,true,Barometer publication sequence counter.
+bmp_T,C,double,true,BMP5xx temperature.
+bmp_P,hPa,double,true,BMP5xx pressure.
+bmp_alt,m,double,true,Absolute barometric altitude from configured sea-level pressure.
+imu_valid,bool,double,true,BMI088 IMU snapshot validity flag.
+imu_upd,bool,double,true,BMI088 IMU snapshot updated during the current scheduler pass.
+imu_seq,count,uint32,true,BMI088 IMU publication sequence counter.
+ax,m/s^2,double,true,BMI088 body-frame acceleration x.
+ay,m/s^2,double,true,BMI088 body-frame acceleration y.
+az,m/s^2,double,true,BMI088 body-frame acceleration z.
+gx,rad/s,double,true,BMI088 body-frame gyro x.
+gy,rad/s,double,true,BMI088 body-frame gyro y.
+gz,rad/s,double,true,BMI088 body-frame gyro z.
+aux_valid,bool,double,true,LIS2DU12 auxiliary acceleration snapshot validity flag.
+aux_upd,bool,double,true,LIS2DU12 auxiliary acceleration snapshot updated during the current scheduler pass.
+aux_seq,count,uint32,true,LIS2DU12 auxiliary acceleration publication sequence counter.
+lis_ax,m/s^2,double,true,LIS2DU12 auxiliary acceleration x.
+lis_ay,m/s^2,double,true,LIS2DU12 auxiliary acceleration y.
+lis_az,m/s^2,double,true,LIS2DU12 auxiliary acceleration z.
+att_valid,bool,double,true,Attitude snapshot validity flag.
+att_upd,bool,double,true,Attitude snapshot updated during the current scheduler pass.
+att_seq,count,uint32,true,Attitude publication sequence counter.
+q0,unitless,double,true,Firmware attitude quaternion scalar component.
+q1,unitless,double,true,Firmware attitude quaternion x component.
+q2,unitless,double,true,Firmware attitude quaternion y component.
+q3,unitless,double,true,Firmware attitude quaternion z component.
+auxvz_valid,bool,double,true,World-vertical acceleration snapshot validity flag.
+auxvz_upd,bool,double,true,World-vertical acceleration snapshot updated during the current scheduler pass.
+auxvz_seq,count,uint32,true,World-vertical acceleration publication sequence counter.
+a_vertical,m/s^2,double,true,Firmware world-vertical acceleration input.
+est_valid,bool,double,true,Firmware vertical-estimator snapshot validity flag.
+est_upd,bool,double,true,Firmware vertical-estimator snapshot updated during the current scheduler pass.
+est_seeded,bool,double,true,Firmware vertical-estimator seeded flag.
+est_seq,count,uint32,true,Firmware vertical-estimator publication sequence counter.
+est_h,m,double,true,Firmware estimator altitude state.
+est_v,m/s,double,true,Firmware estimator vertical-speed state.
+est_a,m/s^2,double,true,Firmware estimator acceleration input.
+arm_state,enum,double,true,Supervisor arming state 0 DISARMED; 1 SAFE; 2 ARMED.
+policy_runtime_enabled,bool,double,true,Software runtime gate for policy computation.
+software_arm_token,bool,double,true,Operator arming token accepted by firmware.
+phase,enum,double,true,Flight phase 0 IDLE; 1 BOOST; 2 COAST; 3 BRAKE; 4 DESCENT.
+actuator_us,us,double,true,Latest post-safety pulse-equivalent actuator command.
+phase_diag_valid,bool,double,true,Flight-phase diagnostic snapshot validity.
+phase_diag_updated,bool,double,true,Flight-phase diagnostic snapshot updated flag.
+phase_diag_seq,count,uint32,true,Flight-phase diagnostic publication sequence.
+phase_diag_t_ms,ms,uint32,true,Flight-phase diagnostic publication timestamp.
+phase_diag_age_ms,ms,uint32,true,Age of latest valid phase diagnostic snapshot.
+phase_launch_latched,bool,double,true,Launch latch state from the phase detector.
+phase_burnout_latched,bool,double,true,Burnout latch state from the phase detector.
+phase_descent_latched,bool,double,true,Descent latch state from the phase detector.
+phase_launch_candidate,bool,double,true,Launch confirmation candidate currently active.
+phase_burnout_candidate,bool,double,true,Burnout confirmation candidate currently active.
+phase_descent_candidate,bool,double,true,Descent confirmation candidate currently active.
+phase_boost_dwell_met,bool,double,true,Minimum boost dwell gate satisfied.
+phase_coast_dwell_met,bool,double,true,Minimum coast dwell gate satisfied.
+phase_brake_active,bool,double,true,Phase detector sees active policy braking intent.
+phase_launch_confirm_ms,ms,uint32,true,Continuous launch-candidate dwell time.
+phase_burnout_confirm_ms,ms,uint32,true,Continuous burnout-candidate dwell time.
+phase_descent_confirm_ms,ms,uint32,true,Continuous descent-candidate dwell time.
+phase_since_launch_ms,ms,uint32,true,Elapsed time since launch latch or uint32 max if unlatched.
+phase_since_burnout_ms,ms,uint32,true,Elapsed time since burnout latch or uint32 max if unlatched.
+policy_valid,bool,double,true,Airbrake policy has authorized nonzero command intent.
+policy_cmd,normalized,double,true,Normalized airbrake deployment intent in [0;1].
+apogee_no_brake,m,double,true,Predicted apogee with airbrakes retracted.
+apogee_full_brake,m,double,true,Predicted apogee with maximum allowed airbrake deployment.
+target_apogee,m,double,true,Effective apogee target used by the current policy pass.
+apogee_error,m,double,true,No-brake predicted apogee minus effective target apogee.
+target_nominal,m,double,true,Nominal configured firmware policy target before uncertainty margin.
+target_effective,m,double,true,Firmware policy target after subtracting uncertainty margin.
+uncertainty_margin,m,double,true,Covariance-derived target reduction applied by firmware policy.
+sea_level_hpa,hPa,double,true,Sea-level pressure reference used by firmware altitude conversion.
+baro_baseline_hpa,hPa,double,true,Pressure baseline captured by firmware for local altitude reference.
+warn_mask,bitmask,uint32,true,Compact firmware warning and validity bitmask.

@@ -1,0 +1,27 @@
+* text=auto
+
+# MATLAB and source files should remain reviewable across platforms.
+*.m text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.txt text eol=lf
+*.tex text eol=lf
+*.py text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.ino text eol=lf
+*.json text eol=lf
+*.prj text eol=lf
+
+# PowerShell scripts are normally edited on Windows.
+*.ps1 text eol=crlf
+
+# Binary/generated figure formats.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.fig binary
+*.mat binary

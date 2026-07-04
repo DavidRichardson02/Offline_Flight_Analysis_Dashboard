@@ -1,0 +1,42 @@
+Caelum Patched Release
+======================
+
+This release packages the canonical V3 refactor and adds a local MATLAB validation harness:
+
+- validate_caelum_release.m
+
+Recommended local validation:
+1. Open the package folder in MATLAB.
+2. Run:
+   validate_caelum_release
+
+This will:
+- generate a synthetic V2 GPS/3D truth-aware log when available
+- run caelum.analyzeLog(...)
+- run caelum.runMonteCarloValidation(...)
+- surface any remaining runtime integration errors in MATLAB directly
+
+Notes:
+- This package was hardened for handoff and packaging consistency.
+- Runtime execution could not be performed in the current environment because MATLAB/Octave was unavailable here.
+
+2026-06-15 Firmware telemetry integration update:
+- firmware_sdlog_schema.csv now matches the latest local Teensy 4.1 SD logger header from C:\Users\98dav\Documents\CaelumSufflamen\utils\sd_logger.cpp.
+- Import/schema alignment now maps latest firmware fields such as est_h, est_v, est_a, and q0/q1/q2/q3 into the existing dashboard analysis contract.
+- plotDashboard now includes firmware phase, phase diagnostics, policy command, actuator, apogee-prediction, and warning telemetry panels.
+- caelum.playLiveFlight provides the first live-style playback view for offline CSVs, cleaned tables, or analyzeLog result structs.
+- caelum.importSerialTelemetry parses captured serial HDR/TLM telemetry into the dashboard table contract.
+- caelum.createLiveTelemetryBuffer, appendLiveTelemetryBuffer, snapshotLiveTelemetryBuffer, and readLiveSerialTelemetry add the bounded ring-buffer and serialport-reader path for true live ingestion.
+- caelum.startLiveSerialDashboard adds the callback-driven serial ingestion loop with a live dashboard, parser-health status, pause/resume, and scrub controls over the buffered samples.
+- caelum.irecMissionProfile defines the source-backed IREC 2026 mission scoring profile for the 10,000 ft AGL use-case: 3048.0 m target apogee, 7,000 ft to 13,000 ft scoring band, and COTS barometric altimeter as the official altitude source.
+- plotDashboard, playLiveFlight, and startLiveSerialDashboard now distinguish the IREC scoring target from firmware target_apogee/target_effective telemetry.
+- plotDashboard and summarizeLog gate IREC target-error reporting so low-altitude legacy/drop-test logs show the 10,000 ft target as reference context instead of a misleading score-like error.
+- LIVE_PLAYBACK_EXTENSION_DESIGN.md documents the current serial-backed live playback architecture, live dashboard loop, and mission scoring profile.
+
+2026-06-16 Phase 2 firmware/dashboard contract alignment:
+- firmware_sdlog_schema.csv now mirrors the full 79-field SD logger header emitted by C:\Users\98dav\Documents\CaelumSufflamen\utils\sd_logger.cpp.
+- firmware_serial_telemetry_schema.csv captures the separate 76-field Serial HDR/TLM payload emitted by C:\Users\98dav\Documents\CaelumSufflamen\utils\telemetry.cpp.
+- validate_firmware_dashboard_alignment.m compares checked MATLAB schema contracts against the firmware header strings, validates the regenerated SD and Serial fixtures, and reports firmware policy target separately from the IREC scoring target.
+- Synthetic_LatestFirmware_PracticalFlight_WithGPS.csv was regenerated with the exact SD firmware prefix plus trailing GPS playback fields.
+- Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt adds a Serial capture-style fixture with repeated HDR, STATUS, and malformed-row coverage for parser and ring-buffer validation.
+- The attached firmware target was deliberately aligned to the 10,000 ft mission by setting POLICY_TARGET_APOGEE_M to 3048.0 m in C:\Users\98dav\Documents\CaelumSufflamen\utils\config.h.
