@@ -1,84 +1,208 @@
 # Offline Flight Analysis Dashboard
 
-MATLAB analysis and validation tools for Caelum flight telemetry, estimator replay, phase-state evidence, airbrake policy review, telemetry freshness, and generated engineering figures.
+MATLAB offline flight-analysis and validation environment for Caelum rocket telemetry. The project imports SD-card and serial telemetry logs, normalizes firmware schemas into a MATLAB analysis contract, replays estimator behavior, renders engineering dashboards, validates firmware/dashboard alignment, and supports live-style telemetry playback from captured or real serial streams.
 
-The repository is structured as a reviewable offline analysis environment. It keeps firmware telemetry contracts, replay logic, validation entry points, and representative fixtures under version control while excluding regenerated plots, PDFs, caches, build outputs, and local machine metadata.
+This repository currently represents the canonical Caelum V3 analysis/refactor package with the integrated V4 dashboard surface.
 
-## Repository Layout
+## What This Project Does
 
-| Path | Purpose |
-| --- | --- |
-| `+caelum/` | MATLAB package code for import, schema alignment, cleaning, replay, estimation, audits, plotting, and live-buffer utilities. |
-| `validate_*.m` | Focused validation entry points for dashboard alignment, replay contracts, telemetry freshness, causality graphs, phase timelines, policy audits, and trajectory/wind evidence. |
-| `Flight Data/` | Representative SD/serial fixtures and small flight-log inputs used by validators. Generated Monte Carlo logs are intentionally ignored. |
-| `firmware_*_schema.csv` | Checked telemetry schema contracts for SD-card and serial firmware outputs. |
-| `vertical_replay_*.csv` | Vertical replay field contract and baseline fixtures. |
-| `Documents and Tools/` | Release notes, design documentation, manuscript source, MATLAB project metadata, and supporting non-generated inputs. |
-| `CaelumSufflamen/` | Nested firmware reference checkout and firmware-side validation context used to keep dashboard contracts aligned. |
-| `exports/` | Regenerated validation figures, CSVs, and PDFs. This directory is ignored by Git. |
-| `Screen Captures/` | Local screenshots and manual review captures. This directory is ignored by Git. |
+The dashboard is designed for post-flight engineering review and firmware contract validation. It provides:
 
-## Requirements
+- strict and robust Caelum telemetry import paths for SD CSV logs and firmware `HDR`/`TLM` serial captures
+- schema alignment between latest Teensy firmware telemetry fields and MATLAB dashboard field names
+- cleaned telemetry tables with timestamp, sensor, estimator, attitude, GPS, phase, policy, and target metadata
+- vertical estimator replay with innovation, covariance, bias, beta, and gating diagnostics
+- optional attitude replay, gravity provenance, 3D/GPS EKF replay, and wind estimation
+- integrated dashboard rendering for altitude, velocity, acceleration, sensor health, estimator uncertainty, GPS, 3D trajectory, wind, phase, policy, provenance, and summary review
+- focused diagnostic boards for replay contracts, policy decisions, telemetry freshness, causality, phase timelines, estimator trust, attitude/gravity provenance, 3D trajectory/wind uncertainty, and Monte Carlo mission envelopes
+- firmware/dashboard contract validation against the checked CaelumSufflamen firmware reference
+- local release validation through `validate_caelum_release.m`
 
-- MATLAB with table, plotting, and standard numeric workflow support.
-- Optional serial hardware access for live telemetry workflows that use `serialport`.
-- Optional Arduino CLI and Teensy 4.1 board support for the nested `CaelumSufflamen` firmware build path.
+## Current Release Entry Point
 
-The offline validators are designed to run from the repository root after MATLAB can see the package directory.
-
-## Quick Start
-
-Open the project root in MATLAB, then run:
+From the repository root in MATLAB:
 
 ```matlab
 addpath(genpath(pwd));
 validation = validate_caelum_release;
 ```
 
-For focused checks, run individual validators:
+`validate_caelum_release.m` renders release dashboard windows when requested, then runs the release-facing validation gates:
+
+- `validate_firmware_dashboard_alignment`
+- `validate_vertical_replay_stack`
+- `validate_irec_mission_profile`
+- `validate_live_telemetry_import`
+
+The validator reports an `overallPassed` result and throws an error if any required release gate fails.
+
+## Repository Layout
+
+| Path | Purpose |
+| --- | --- |
+| `+caelum/` | Main MATLAB package for import, schema alignment, cleaning, event detection, estimator replay, 3D/GPS replay, wind estimation, dashboards, live playback, buffering, and export utilities. |
+| `validate_*.m` | Release and feature-specific validation scripts for firmware alignment, replay contracts, live telemetry import, policy audits, phase timelines, causality, telemetry freshness, estimator trust, trajectory/wind evidence, and mission envelopes. |
+| `Flight Data/` | Representative SD and serial fixtures used by validators. Generated Monte Carlo logs are intentionally ignored. |
+| `firmware_sdlog_schema.csv` | Checked SD-card logger schema contract mirrored from the firmware reference. |
+| `firmware_serial_telemetry_schema.csv` | Checked serial `HDR`/`TLM` telemetry schema contract mirrored from the firmware reference. |
+| `vertical_replay_*.csv` | Vertical replay field contract and baseline fixtures. |
+| `Documents and Tools/` | Release notes, design documentation, manuscript/source notes, MATLAB project metadata, and supporting non-generated project documents. |
+| `CaelumSufflamen/` | Firmware reference checkout and firmware-side validation context used to keep dashboard contracts aligned. |
+| `exports/` | Regenerated figures, CSVs, and PDFs. Ignored by Git. |
+| `Screen Captures/` | Local screenshots and manual review captures. Ignored by Git. |
+
+## Core MATLAB Workflow
+
+The primary end-to-end entry point is:
+
+```matlab
+results = caelum.analyzeLog("Flight Data/Synthetic_LatestFirmware_PracticalFlight_WithGPS.csv", ...
+    MakePlots=true, ...
+    ReplayEstimator=true, ...
+    MakeDashboard=true, ...
+    MakeAuxiliaryDashboard=true, ...
+    ExportFigures=false);
+```
+
+At a high level, `caelum.analyzeLog` performs:
+
+1. strict import with robust-import fallback
+2. firmware schema alignment into the dashboard contract
+3. telemetry cleaning and event detection
+4. attitude replay and vertical estimator replay when enabled
+5. truth and consistency metric calculation when truth data is available
+6. optional 3D/GPS replay and wind estimation
+7. overview/dashboard rendering
+8. optional figure and CSV export
+
+## Live and Serial Telemetry Support
+
+The live-playback extension lets the same engineering review surface support:
+
+- post-flight playback from SD CSV logs
+- captured serial telemetry replay from firmware `HDR`/`TLM` text logs
+- bounded live serial ingestion through MATLAB `serialport`
+- ring-buffer snapshots for live dashboard updates
+- pause/resume and scrub-style inspection of buffered telemetry samples
+
+Relevant entry points include:
+
+```matlab
+% Replay a logged SD or serial capture file.
+pb = caelum.playLiveFlight("Flight Data/Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt");
+
+% Parse a captured serial HDR/TLM stream.
+[Tserial, report] = caelum.importSerialTelemetry("Flight Data/Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt");
+
+% Build and snapshot a deterministic telemetry buffer.
+buffer = caelum.createLiveTelemetryBuffer(Capacity=2000);
+buffer = caelum.appendLiveTelemetryBuffer(buffer, readlines("Flight Data/Synthetic_LatestFirmware_PracticalFlight_HDRTLM.txt"));
+[Tlive, liveReport, buffer] = caelum.snapshotLiveTelemetryBuffer(buffer);
+
+% Start a true live serial dashboard.
+session = caelum.startLiveSerialDashboard("/dev/cu.usbmodem101", 115200, ...
+    Capacity=2000, RefreshPeriod_s=0.25);
+```
+
+See `Documents and Tools/LIVE_PLAYBACK_EXTENSION_DESIGN.md` for the live playback architecture and firmware telemetry contract notes.
+
+## Validation Commands
+
+Run the full release gate:
+
+```matlab
+validate_caelum_release
+```
+
+Run focused validators as needed:
 
 ```matlab
 validate_firmware_dashboard_alignment
+validate_vertical_replay_stack
+validate_irec_mission_profile
+validate_live_telemetry_import
 validate_replay_contract_diff_viewer
 validate_flight_evidence_navigator
 validate_telemetry_freshness_heatmap
 validate_causality_graph
+validate_phase_state_machine_timeline
+validate_policy_decision_audit
+validate_estimator_trust_dashboard
+validate_attitude_gravity_provenance_view
+validate_3d_trajectory_wind_uncertainty_tube
+validate_apogee_sensitivity_waterfall
+validate_monte_carlo_mission_envelope_board
 ```
 
-Most validators write regenerated artifacts under `exports/`. Those outputs are intentionally reproducible review products, not source files.
+Most validation products are regenerated into ignored output folders such as `exports/` and should not be committed unless a specific artifact is intentionally promoted into documentation.
 
-## Data And Contract Policy
+## Firmware and Mission Contract
 
-The checked CSV and serial fixtures are part of the reproducible validation contract. Generated artifacts are not.
+The repository tracks both MATLAB analysis code and firmware-facing telemetry contracts. The validation workflow checks that:
 
-Tracked inputs include:
+- `firmware_sdlog_schema.csv` matches the SD logger field order from the firmware reference
+- `firmware_serial_telemetry_schema.csv` matches the serial telemetry `HDR` payload order
+- latest SD and serial fixtures can be imported, aligned, cleaned, and buffered
+- firmware policy target fields remain separate from the IREC mission scoring target
+- the IREC 10,000 ft AGL mission profile is encoded as a 3048.0 m target apogee
 
-- MATLAB source and validation scripts.
-- Firmware telemetry schema CSVs.
-- Representative SD and serial telemetry fixtures in `Flight Data/`.
-- Release notes and engineering design documentation.
-- Firmware reference source and documentation under `CaelumSufflamen/`.
+The default configuration loads the IREC mission profile through `caelum.defaultConfig()`.
 
-Ignored outputs include:
+## Requirements
 
-- `exports/` render products.
-- `Screen Captures/` screenshots.
-- MATLAB autosaves and binary workspaces.
-- Python bytecode and caches.
-- Arduino/Teensy build products.
-- Generated Monte Carlo run logs.
-- Local environment and credential files.
+Required:
 
-## Firmware Reference
+- MATLAB with support for modern table workflows, `arguments` blocks, `tiledlayout`, standard plotting, and numeric analysis
 
-The nested `CaelumSufflamen/` directory provides firmware-side context for the dashboard contract. Its build notes are in `CaelumSufflamen/Documentation/BUILDING.md`. The dashboard schema files at the repository root mirror firmware SD and serial telemetry fields so replay and visualization remain tied to the flight-computer data contract.
+Optional:
 
-## Validation Notes
+- serial hardware access for live telemetry workflows using MATLAB `serialport`
+- Arduino CLI and Teensy 4.1 board support for firmware-reference build workflows under `CaelumSufflamen/`
 
-`validate_caelum_release.m` is the release-facing validation entry point. It runs the dashboard alignment checks, vertical replay stack, IREC mission profile validation, and live telemetry import validation. Focused validators provide narrower evidence for individual views and contracts.
+No mandatory third-party MATLAB toolbox dependency is documented in this repository.
 
-When changing telemetry fields, update the firmware schema CSVs, import alignment, fixtures, validators, and documentation together. The validation outputs should be regenerated locally, reviewed, and left untracked unless a specific artifact is intentionally promoted into documentation.
+## Data and Source-Control Policy
+
+Tracked source-of-truth files include:
+
+- MATLAB source and validation scripts
+- telemetry schema contracts
+- representative validation fixtures
+- firmware reference source and documentation
+- release notes and project documentation
+
+Ignored/generated files include:
+
+- `exports/` render products
+- `Screen Captures/` local screenshots
+- generated Monte Carlo logs
+- MATLAB autosaves and binary workspaces
+- Python bytecode and caches
+- Arduino/Teensy build products
+- local IDE files, OS metadata, credentials, tokens, keys, and environment files
+
+## Typical Development Loop
+
+1. Update firmware schema, MATLAB import logic, replay logic, dashboard logic, or fixtures.
+2. Run the focused validator for the changed subsystem.
+3. Run `validate_caelum_release` before release or handoff.
+4. Review regenerated figures/CSVs under ignored output directories.
+5. Commit only source, fixtures, schemas, and documentation that are intended to be permanent repository inputs.
+
+## Repository Metadata
+
+Suggested GitHub description:
+
+```text
+MATLAB offline flight-analysis dashboard for Caelum telemetry, estimator replay, firmware contract validation, live serial playback, and mission evidence review.
+```
+
+Suggested GitHub topics:
+
+```text
+matlab, flight-analysis, telemetry, rocket, aerospace, sensor-fusion, estimator-replay, kalman-filter, gps, serial-telemetry, teensy, firmware-validation, monte-carlo, dashboard, validation, caelum
+```
 
 ## License
 
-No open-source license has been selected for this project. For a private repository, that means reuse rights are not granted by default. Add an explicit license only after choosing the intended distribution model.
+This project is released under the MIT License. See `LICENSE` for details.
